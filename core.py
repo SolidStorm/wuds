@@ -79,7 +79,6 @@ def resolve_oui(mac):
     return ouis[mac]
 
 def call_alerts(**kwargs):
-    #print  "[MAC]: %s | bssid: %s | rssi: %i | essid: %s | oui: %s" % (kwargs['bssid'])
     print  "bssid: %s | rssi: %s | essid: %s | oui: %s" % (kwargs['bssid'], str(kwargs['rssi']), kwargs['essid'], kwargs['oui'])
     for var in globals():
         # find config variables for alert modules
