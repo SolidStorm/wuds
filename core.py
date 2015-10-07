@@ -62,7 +62,8 @@ def resolve_oui(mac):
         # retrieve mac vendor from oui lookup api
         else:
             try:
-                resp = urllib2.urlopen('https://www.macvendorlookup.com/api/v2/%s' % mac)
+                #resp = urllib2.urlopen('https://www.macvendorlookup.com/api/v2/%s' % mac)
+                resp = urllib2.urlopen('https://localhost/api/v2/%s' % mac)
                 if resp.code == 204:
                     ouis[mac] = 'Unknown'
                 elif resp.code == 200:
@@ -78,6 +79,8 @@ def resolve_oui(mac):
     return ouis[mac]
 
 def call_alerts(**kwargs):
+    #print  "[MAC]: %s | bssid: %s | rssi: %i | essid: %s | oui: %s" % (kwargs['bssid'])
+    print  "bssid: %s | rssi: %s | essid: %s | oui: %s" % (kwargs['bssid'], str(kwargs['rssi']), kwargs['essid'], kwargs['oui'])
     for var in globals():
         # find config variables for alert modules
         if var.startswith('ALERT_') and globals()[var] == True:
@@ -103,7 +106,10 @@ def packet_handler(pkt):
         bssid = frame[10:16].encode('hex')
         bssid = ':'.join([bssid[x:x+2] for x in xrange(0, len(bssid), 2)])
         # parse rssi
-        rssi = struct.unpack("b",rtap[-4:-3])[0]
+        ## Fixed bad rssi by SolidStorm
+	#print "rtap", ''.join(x.encode('hex') for x in rtap[-2:-1])
+	#rssi = struct.unpack("b",rtap[-4:-3])[0]
+        rssi = struct.unpack("b",rtap[-2:-1])[0]
         # parse essid
         essid = frame[26:26+ord(frame[25])] if ord(frame[25]) > 0 else '<None>'
         # build data tuple
