@@ -47,8 +47,8 @@ DEBUG = True
 #========
 
 # (BOOL) Enable/Disable alert modules
-ALERT_SMS = True
-ALERT_PUSHOVER = True
+ALERT_SMS = False
+ALERT_PUSHOVER = False
 
 #==================
 # ALERT_SMS CONFIG
