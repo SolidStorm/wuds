@@ -23,10 +23,12 @@ ADMIN_OUI = 'Admin OUI'
 ADMIN_IGNORE = False
 
 # (INT) RSSI threshold for triggering alerts
-RSSI_THRESHOLD = -50
+#RSSI_THRESHOLD = -50
+RSSI_THRESHOLD = -130
 
 # (INT) Number of seconds between alerts for persistent foreign probes
-ALERT_THRESHOLD = 120
+#ALERT_THRESHOLD = 120
+ALERT_THRESHOLD = 100
 
 # (STR) Path to the database file
 LOG_FILE = 'log.db'
