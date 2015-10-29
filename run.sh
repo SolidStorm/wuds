@@ -7,7 +7,7 @@ sudo python ./core.py
 
 # or : ifconfig wlan0 down && iwconfig wlan0 mode Monitor && ifconfig wlan0 up
 
-aircrack-ng start wlan0
+airmon-ng start wlan0
 sudo python ./core.py
 
 airmon-ng stop mon0

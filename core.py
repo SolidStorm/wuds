@@ -90,7 +90,6 @@ def resolve_who(mac):
       return '%s' % who
 
 def call_alerts(**kwargs):
-    print 'in call alerts'
     print  "bssid: %s | rssi: %s | essid: %s | oui: %s | who:%s" % (kwargs['bssid'], str(kwargs['rssi']), kwargs['essid'], kwargs['oui'], kwargs['who'])
     for var in globals():
         # find config variables for alert modules
