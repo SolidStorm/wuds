@@ -78,8 +78,33 @@ def resolve_oui(mac):
                 return 'Error'
     return ouis[mac]
 
+def resolve_who(mac):
+    # check if mac is associated to any known entity 
+    #TODO
+    #with sqlite3.connect(LOG_FILE) as conn:
+    #  with closing(conn.cursor()) as cur:
+    # build the database schema if necessary
+    print 'in resolve who'
+
+    #values_str = ','.join('?'*len(values))
+    #query = 'SELECT who FROM entity WHERE mac LIKE "%s"' % (mac)
+    #cur.execute(query, values)
+    #conn.commit()
+
+    cur.execute('SELECT * FROM entity WHERE mac=?', mac)
+    rowwho=c.fetchone()
+    if rowwho == None:
+      return 'unknown'
+    else:
+      print str(rowwho) 
+      return str(rowwho)
+
+    print 'in resolve who'
+    return str("Unknown")
+
 def call_alerts(**kwargs):
-    print  "bssid: %s | rssi: %s | essid: %s | oui: %s" % (kwargs['bssid'], str(kwargs['rssi']), kwargs['essid'], kwargs['oui'])
+    print 'in call alerts'
+    print  "bssid: %s | rssi: %s | essid: %s | oui: %s | who:%s" % (kwargs['bssid'], str(kwargs['rssi']), kwargs['essid'], kwargs['oui'], kwargs['who'])
     for var in globals():
         # find config variables for alert modules
         if var.startswith('ALERT_') and globals()[var] == True:
@@ -94,11 +119,13 @@ def call_alerts(**kwargs):
                     log_message(1, '%s alert failed. [%s]' % (var[6:], kwargs['bssid']))
 
 def packet_handler(pkt):
+    #print 'packet handler'
     rtlen = struct.unpack('h', pkt[2:4])[0]
     ftype = (ord(pkt[rtlen]) >> 2) & 3
     stype = ord(pkt[rtlen]) >> 4
     # check if probe request
     if ftype == 0 and stype == 4:
+	print 'test'
         rtap = pkt[:rtlen]
         frame = pkt[rtlen:]
         # parse bssid
@@ -136,7 +163,9 @@ def packet_handler(pkt):
             if (datetime.now() - alerts[bssid]).seconds > ALERT_THRESHOLD:
                 if LOG_LEVEL == 4: log_probe(*data)
                 alerts[bssid] = datetime.now()
-                call_alerts(bssid=bssid, rssi=rssi, essid=essid, oui=resolve_oui(bssid))
+                call_alerts(bssid=bssid, rssi=rssi, essid=essid, oui=resolve_oui(bssid), who=resolve_who(bssid))
+  
+	
 
 # connect to the wuds database
 # wuds runs as root and should be able to write anywhere
@@ -145,6 +174,7 @@ with sqlite3.connect(LOG_FILE) as conn:
         # build the database schema if necessary
         cur.execute('CREATE TABLE IF NOT EXISTS probes (dtg TEXT, mac TEXT, rssi INT, ssid TEXT, oui TEXT)')
         cur.execute('CREATE TABLE IF NOT EXISTS messages (dtg TEXT, lvl TEXT, msg TEXT)')
+	cur.execute('CREATE TABLE IF NOT EXISTS entity (mac TEXT, who TEXT)')
         conn.commit()
         log_message(0, 'WUDS started.')
         # set up the sniffer
