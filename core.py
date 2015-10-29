@@ -80,27 +80,14 @@ def resolve_oui(mac):
 
 def resolve_who(mac):
     # check if mac is associated to any known entity 
-    #TODO
-    #with sqlite3.connect(LOG_FILE) as conn:
-    #  with closing(conn.cursor()) as cur:
-    # build the database schema if necessary
-    print 'in resolve who'
+    query = 'SELECT who FROM entity WHERE mac LIKE "%s"' % (mac)
+    cur.execute(query)
+    who=cur.fetchone()
 
-    #values_str = ','.join('?'*len(values))
-    #query = 'SELECT who FROM entity WHERE mac LIKE "%s"' % (mac)
-    #cur.execute(query, values)
-    #conn.commit()
-
-    cur.execute('SELECT * FROM entity WHERE mac=?', mac)
-    rowwho=c.fetchone()
-    if rowwho == None:
-      return 'unknown'
+    if who == None:
+      return 'Unknown'
     else:
-      print str(rowwho) 
-      return str(rowwho)
-
-    print 'in resolve who'
-    return str("Unknown")
+      return '%s' % who
 
 def call_alerts(**kwargs):
     print 'in call alerts'
@@ -125,7 +112,6 @@ def packet_handler(pkt):
     stype = ord(pkt[rtlen]) >> 4
     # check if probe request
     if ftype == 0 and stype == 4:
-	print 'test'
         rtap = pkt[:rtlen]
         frame = pkt[rtlen:]
         # parse bssid
@@ -190,6 +176,7 @@ with sqlite3.connect(LOG_FILE) as conn:
             except KeyboardInterrupt:
                 break
             except:
-                if DEBUG: print traceback.format_exec()
+                if DEBUG: print 'something wrong'
+                #if DEBUG: print traceback.format_exec()
                 continue
         log_message(0, 'WUDS stopped.')
